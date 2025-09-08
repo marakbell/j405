@@ -1,0 +1,7 @@
+"0","students <- read_csv(""https://pos.it/r4ds-students-csv"")"
+"0","students <- read_csv(""https://pos.it/r4ds-students-csv"", na = c(""N/A"", """"))"
+"0","students |> "
+"0","  rename("
+"0","    student_id = `Student ID`,"
+"0","    full_name = `Full Name`"
+"0","  )"
