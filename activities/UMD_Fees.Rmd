@@ -62,8 +62,6 @@ umd_fees |>
 
 Write a few sentences about what you found in the data. What's the story here?
 
-
-
-
+# In the data, we found that the Student Sustainability sector, there was the largest percent change across the years at 150%. It's worth reporting on that change and seeing the growth (or lackthereof) in the department and its' sustainability goals and projects, along with fleshing out where the money went. Some things also worth noting are the athletics department's flat fees and how else the department gets and allocates their money. Recreation Services also has the highest fees at the university.
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
