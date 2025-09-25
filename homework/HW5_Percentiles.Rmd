@@ -10,7 +10,6 @@ You will need to load the tidyverse library and the janitor library
 
 ```{r}
 library(tidyverse)
-install.packages("janitor")
 library(janitor)
 ```
 
@@ -28,7 +27,10 @@ Calculate violent and property crime rates for each city for both years using `m
 
 ```{r}
 md_cities_rates <- md_cities |> 
-  mutate(violent_rate_2019 = violent2019/pop2019 * 1000, property_rate_2019= property2019/pop2019 * 1000, violent_rate_2020 = violent2020/pop2020 * 1000, property_rate_2020= property2020/pop2020 * 1000)
+  mutate(violent_rate_2019 = violent2019/pop2019 * 1000,
+  property_rate_2019= property2019/pop2019 * 1000,
+  violent_rate_2020 = violent2020/pop2020 * 1000,
+  property_rate_2020= property2020/pop2020 * 1000)
 
 ```
 
@@ -70,3 +72,26 @@ The two Maryland cities trump others in the state with Ocean City's rate of 23 v
 ### Task 9: Save Your Work and Put it on GitHub
 
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
+
+### Task 10: Percentiles
+
+```{r}
+
+md_cities_percentiles <- md_cities_rates |>
+  mutate(percentile = ntile(violent_rate_2020, 100))
+
+md_cities_percentiles |>
+  select (1,2,11,13)
+```
+
+ANSWER:
+9 cities are above the 90th percentile.
+
+```{r}
+
+md_cities_percentiles |> 
+  summarize(IQR = IQR(violent_rate_2020))
+
+```
+ANSWER:
+Yes, I think that my best story idea would actually be with the use of percentile data. This is because I believe readers have a better immediate understanding of the headline, numbers and data described through percentiles than rates. For example, if I went with the previous story idea, I'd have to describe in a mouthful that "The two Maryland cities trump others in the state with Ocean City's rate of 23 violent crimes per 1000 people and Baltimore's rate of 15 crimes per 1000 people." Instead, using percentiles would allow me to say briefly but with great meaning, that Ocean City was in the 100th percentile for violent crime rates in Maryland in 2020, or that, for example, Princess Anne placed above the 90th percentile (at the 97th percentile) for violent crime rates across the state in 2020. It's clear that these cities had the highest rates of violent crime compared to the rest of the state.
