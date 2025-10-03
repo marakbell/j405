@@ -1,31 +1,98 @@
 ---
 title: "HW7_MandMs"
+date: 10/1/2025
 ---
+
 
 In this assignment, you'll be picking up where you left off with the M&Ms activity. You'll load the data and perform some basic statistical analysis. Follow the steps below to complete the assignment.
 
 ### Task 1: Load the tidyverse
 
-
-### Task 2: Load the M&Ms dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv
-
-
-### Task 3: Sample 5 rows of data from the dataset
+```{r}
+library(tidyverse)
+```
 
 
-### Task 4: Calculate the mean age and standard deviation of the sample, using either the blue or white number of M&Ms
+### Task 2: Load an M&Ms dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv
+```{r}
+mms <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv")
+```
 
 
-### Task 5: Calculate the mean age and standard deviation of the population, using the same measure as in Task 4
+### Task 3: Sample 5 rows of data from the dataset, and then sample 10 rows, saving each to separate dataframes called sample5 and sample10. Be sure to use set.seed(1234) before you start.
+```{r}
+set.seed(1234)
+sample5 <- mms |> 
+  sample_n(5)
+
+sample10 <- mms |> 
+  sample_n(10)
+
+```
 
 
-### Task 6: Compare the sample and population statistics
+### Task 4: Calculate the mean, median and standard deviation of red M&Ms from each of the samples.
+```{r}
+sample5 |> summarize(
+  mean = mean(red), 
+  sd = sd(red),
+  median = median(red))
 
-Compare the two sets of means and standard deviations. Are they similar?
+sample10 |> summarize(
+  mean = mean(red), 
+  sd = sd(red),
+  median = median(red))
+```
 
-### Task 7: Describe the results
 
-Write a few sentences about what you found in the data. What does this tell you about the M&Ms dataset and about the act of random sampling?
+### Task 5: Calculate the mean, median and standard deviation of red M&Ms from the population
 
+```{r}
+mms |> summarize(
+  mean = mean(red), 
+  sd = sd(red),
+  median = median(red))
+```
+
+### Task 6: Make three histograms: one each for sample5, sample10 and the original dataset. Include a headline. Use a consistent binwidth.
+
+```{r}
+sample5 |> 
+  ggplot() + 
+  geom_histogram(aes(x = red), binwidth = 2) +
+  labs(title = "Sample 5 of Red M&Ms", x = "Red M&Ms", y = "Frequency")
+
+sample10 |> 
+  ggplot() + 
+  geom_histogram(aes(x = red), binwidth = 2) +
+  labs(title = "Sample 10 of Red M&Ms", x = "Red M&Ms", y = "Frequency")
+
+mms |> 
+  ggplot() + 
+  geom_histogram(aes(x = red), binwidth = 2) +
+  labs(title = "Original Population of Red M&Ms", x = "Red M&Ms", y = "Frequency")
+
+
+```
+
+
+### Task 7: Answer questions
+
+
+Compare the three sets of means, standard deviations and histograms. Which are more helpful to you in understanding the accuracy of the samples?
+
+# Answer: Comparing the means and medians and looking at the histograms are more helpful in understanding the accuracy of the samples compared to just looking at the standard deviations. For example, I could look at both samples and see that Sample10 has a closer median to the population and follows a closer shape to the population histogram than Sample5 does to the population histogram. Though Sample10 is a rough representation of the population, it's clear through the shape that the data better reflects the population than Sample5.
+
+What does this exercise tell you about the relationship between sample size and estimate accuracy?
+
+# Answer: This exercise once again emphasizes the importance of a large sample size. Larger sample sizes compared to smaller ones reduce sampling error and can better reflect the population because random outliers are minimized with more data, also decreasing the margin of error.
+
+How does random sampling introduce variation into statistical estimates?
+
+# Answer: Random sampling can introduce variation into statistical estimates because it allows for a population to be represented more, as biases like selection bias or convenience sampling can negatively impact the representation of a sample.
+
+If you repeated this process, would the samples always be identical? Why or why not?
+
+# Answer: If I repeated this process, samples would not always be identical because the random sampling part of the code allows for every data point to have an equal chance of being selected, therefore allowing variation. 
 
 When finished, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
