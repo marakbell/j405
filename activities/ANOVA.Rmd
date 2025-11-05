@@ -1,6 +1,6 @@
 ---
 title: "ANOVA for Journalists: Analyzing College Admissions Test Scores"
-date: 8-22-2025
+date: 11-3-2025
 ---
 
 ```{r setup, include=FALSE}
@@ -60,10 +60,20 @@ admission_summary <- admissions_data |>
 print(admission_summary)
 ```
 
+Context: Fall 2024 midpoint SAT for University of Maryland was 1,465.
+
+
 **Task 3** Describe the data
 
 Write a couple of sentences describing the differences in SAT scores between types of colleges, using the descriptive statistics we just generated.
 
+
+**
+- Community college has the lowest average SAT score at 1068, compared to private (1435) and public college (1361).
+- Community college has the largest standard deviation at 142.48184, meaning that data is less clustered around the mean and have a more spread out set of data than private and public college. 
+- Public college has a standard deviation in between community college and private college at 109.02259, meaning that data is spread out, but not as much as community college. Private college has data that is more clustered around the mean, according to the standard deviation of 86.75233, than the other two types of colleges.
+- For private and public schools, the max score is the same at 1600.000, while community college has a max score of 1393.962.
+**
 
 
 ## Task 4: Visualize the Data
@@ -108,6 +118,29 @@ summary(anova_result)
 
 The F-value is huge (284.3). The F-value measures the ratio of between-group variance to within-group variance, and this high value suggests the differences between college types far outweigh the variation within each type. The p-value is very low, indicating the differences between college types are statistically significant at any reasonable significance level. The three asterisks (***) highlight that this is significant at the 0.001 level. So we can say that with confidence that there are real differences in SAT scores between the three types of colleges.
 
+How do we know the F-value is huge?
+We can calculate the critical value for an F statistic by using the qf() function in R
+
+```{r}
+# Your ANOVA has:
+# df1 (between groups) = 2
+# df2 (within groups/residuals) = 297
+# Common alpha levels: 0.05, 0.01, 0.001
+
+# Critical values at different significance levels:
+critical_f_05 <- qf(0.95, df1 = 2, df2 = 297)
+critical_f_01 <- qf(0.99, df1 = 2, df2 = 297)
+critical_f_001 <- qf(0.999, df1 = 2, df2 = 297)
+
+cat("Here are the Critical F-values:\n")
+cat("alpha of α = 0.05: ", round(critical_f_05, 3), "\n")
+cat("alpha of α = 0.01: ", round(critical_f_01, 3), "\n")
+cat("alpha ofα = 0.001:", round(critical_f_001, 3), "\n")
+cat("The F-statistic is: 284.3\n")
+cat("Ratio to most extreme critical value (α=0.001) to the F statistic:", round(284.3/critical_f_001, 1), "x\n")
+```
+
+
 ## Task 5: Compare the differences between specific pairs
 
 ```{r post-hoc}
@@ -134,3 +167,5 @@ Based on our analysis, we can now answer:
 
 Answer those questions, providing evidence for your answers, and then write a headline and a lead paragraph reporting these findings using active voice and focusing on the differences across types.
 
+- There is a significant difference in SAT scores across college types. We can tell because  the ANOVA test shows three asterisks, indicating that the P-value is highly statistically significant and very small, less than the test statistic. It's further proven when we see that the F-value is  very high in comparison to the test statistics. This means that there is large variation between the groups (different types of Colleges). Furthermore, we can see that after performing the Tukey test, the comparison between each group has a very low P-value, meaning very high statistical significance.
+- Private and community colleges have the largest difference between eachother, with a difference of 366.95577. Private colleges have SAT scores that are 366.96 points higher than community colleges on average. Public and community college has the second largest difference between eachother at 292.55140. Public colleges have SAT scores that are 292.55 points higher than community colleges on average. Public and private college doesn't have a great difference at a 74.40438 point difference. Public colleges have SAT scores that are 74.40 points lower than private colleges on average.
