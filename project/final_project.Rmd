@@ -1,0 +1,60 @@
+---
+title: "final_project"
+author: "Mara K. Bell"
+date: "2025-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r load-data}
+billboard <- read_csv("billboard.csv")
+```
+## Data Source Overview
+
+This workbook contains substantial data about every song to ever top the Billboard Hot 100 between August 4, 1958 and January 11, 2025, compiled by Chris Dalla Riva.
+
+Creator: Chris Dalla Riva
+Data Dictionary: https://docs.google.com/spreadsheets/d/1MSp-Feo0X54bthtB5KT5ucSzUEwS89DHqVgKqDVOC7g/edit?usp=sharing
+
+## Describing the Dataset
+
+- This dataset looks at songs that topped the Billboard Hot 100 between 1958 and 2025.
+- It contains the song title, the artist, the first week it hit number one (date), how long it stayed (number of weeks), ratings, label information, genre, artist information (like where they're from, their gender, ethnicity (Black or White), songwriter information, producer information, musical information (like the danceability and energy), and other information.
+- The time period of this data stretches between Aug. 4, 1958 to Jan. 11, 2025.
+- For my analysis, the song title, genre, happiness, artist gender, and date would likely matter the most.
+- This data is missing important information about artists who are not White nor Black, as it only specifies for those two races.
+
+## Calculating Basic Statistics
+```{r basic-statistics}
+billboard |>
+  summarize(
+    mean = mean(Happiness, na.rm = TRUE),
+    median = median(Happiness, na.rm = TRUE),
+    min = min(Happiness, na.rm = TRUE),
+    max = max(Happiness, na.rm = TRUE))
+```
+## Exploring the Data
+```{r explore-data}
+glimpse(billboard)
+
+billboard |>
+  summarize(
+    rows = n(),
+    columns = ncol(billboard)
+  )
+```
+## Propose Hypotheses
+Ideas:
+- Newer No. 1 songs are happier than older No. 1 songs.
+- Female artists hitting the billboard have increased over time.
+- Energy levels in No. 1 songs have increased over time.
+- No. 1 songs are coming from smaller groups or solo acts over time.
+
+## Questions
+- How might I better word my chosen hypothesis to be more testable and accurate instead of being left up for interpretation with some parts?
+- Why are there only Black and White racial categories listed?
