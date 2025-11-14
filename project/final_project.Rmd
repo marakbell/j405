@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+# Loading Data
+I'm loading a dataset called Billboard Hot 100 here.
 
 ```{r load-data}
 billboard <- read_csv("billboard.csv")
@@ -30,6 +32,9 @@ Data Dictionary: https://docs.google.com/spreadsheets/d/1MSp-Feo0X54bthtB5KT5ucS
 - This data is missing important information about artists who are not White nor Black, as it only specifies for those two races.
 
 ## Calculating Basic Statistics
+
+Here, I'm calculating the basic statistics of the Happiness category in "billboard" using summarize(). I'm looking at the mean, median, minimum, and maximum of this data.
+
 ```{r basic-statistics}
 billboard |>
   summarize(
@@ -39,6 +44,9 @@ billboard |>
     max = max(Happiness, na.rm = TRUE))
 ```
 ## Exploring the Data
+
+I'm exploring the Billboard data here by taking a glimpse, and using summarize() to look at the number of rows and columns in this dataset.
+
 ```{r explore-data}
 glimpse(billboard)
 
