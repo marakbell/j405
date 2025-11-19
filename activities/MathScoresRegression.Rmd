@@ -91,10 +91,8 @@ schools <- schools |>
 The schools with the biggest positive residuals are performing better than expected, while the schools with the biggest negative residuals are performing worse than expected, based on their FARMS percentage. Look at the absolute values of the residuals; what are the largest differences between the predicted result and the actual math scores?
 
 **
-- 
-
-
-
+- The largest differences between the predicted results and the actual math scores were 45.8, 38.9, and 30.9.
+- These large residuals indicate that the model doesn't fit these data points well. A lot of the data points have very large residuals, so this could be suggested for the entire data set that the model isn't reliable.
 **
 
 ## Task: Evaluate the model (3 points)
@@ -102,7 +100,9 @@ The schools with the biggest positive residuals are performing better than expec
 A school board member has said at a meeting that elementary schools with fewer students on free and reduced price meals do better on standardized math tests. Describe what conclusions you'd draw from this model's results and how it would influence a story pitch about the school board member and math scores.
 
 **
-- 
-
-
+- Based on this model's results, I would suggest that the school board member is incorrect. 
+- The linear regression model shows no statistically significant relationship as indicated by the high p-value.
+- Looking at the scatter plot, the correlation is also very weakly positive, suggesting that there is not a strong correlation.
+- The adjusted R-squared also only shows that 2.5% of FARMS percentage explains why math scores differ across schools.
+- This would influence a story pitch about the school board member and math scores by influencing me to look more into the school board member's intentions and see if there is any correlation with what they are arguing and their political motives.
 **
