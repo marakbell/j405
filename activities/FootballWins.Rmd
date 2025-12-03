@@ -10,7 +10,7 @@ Multiple regression analysis is a statistical method used to understand the rela
 
 ```{r setup}
 library(tidyverse)
-#install.packages('corrplot')
+install.packages('corrplot')
 library(corrplot)
 ```
 
@@ -46,7 +46,7 @@ The coefficients tell us the estimated effect of each independent variable on th
 *   **Takeaways**: The coefficient is 0.150593, suggesting that each additional takeaway is associated with an increase in wins by about 0.151, which is near the threshold of significance (p = 0.07928). This suggests a potentially meaningful, though not conventionally statistically significant, positive effect on wins.
 *   **Points Scored**: The coefficient is 0.038732, which is significant (p = 0.00665). This indicates that each additional point scored is associated with an increase in wins by about 0.039, suggesting a clear and meaningful impact.
 
-### Model Fit (3 points)
+### Model Fit
 
 *   **Residual Standard Error**: The RSE of 2.072 tells us that the typical prediction by the model deviates from the actual number of wins by about 2.072 wins.
 *   **Multiple R-squared**: 0.6232 indicates that about 62.32% of the variability in wins is explained by the model, which is relatively high, suggesting a good fit.
@@ -56,6 +56,9 @@ The coefficients tell us the estimated effect of each independent variable on th
 Is this a useful model, based on what you've seen? Why?
 
 ANSWER HERE
+- Yes, this model is useful for what we are evaluating. This is indicated in our calculations, first looking at the Multiple R-squared value at 0.6232. This number indicates that roughly 62.32% of the variability in wins is explained through the model, a relatively high figure, suggesting that the model is a good fit for explaining the data.
+- The adjusted R-squared value is still significant at 58.28% of variance being explained by the model after accounting for the number of variables used.
+- The F-statistic being relatively high at 15.44 suggests that the groups we are looking at have large variation between each other, meaning that the differences are less likely due to random chance. There is also a low p-value at 4.058e-06. Looking at these two values, this model is statistically significant and useful. 
 
 ## Correlation Analysis
 
@@ -75,14 +78,19 @@ corr_matrix <- cor(selected_vars)
 corrplot(corr_matrix, method = "circle")
 ```
 
-## Results Interpretation (4 points)
+## Results Interpretation
 
 The results from our correlation analysis show the strength of the relationships between the number of wins and factors like yards gained, takeaways, and points scored. High positive correlations indicate strong relationships where increases in one variable are associated with increases in another. Conversely, negative correlations suggest an inverse relationship. By understanding these dynamics, journalists can better explain the factors that contribute to a team's success or failure in a season.
 
 Which of these three factors - Yards Gained, Takeaways and Points Scored - have the most impact on wins? Are there any that do not seem impactful at all?
 
 ANSWER HERE
+Of these three factors, Points Scored has the most impact on wins. This is clear in the visualization, showing a dark blue shaded large circle. This signifies that near strong positive correlation between points scored and wins at 0.7078293. Yards Gained seems to not be impactful at all to the wins because of its low correlation at 0.4430188.
 
-## Using the Model (3 points)
+## Using the Model
 
 Without using the words "multiple regression model", describe how you could use this model to cover a team or game.
+
+- I'd use this model to cover a highly successful football game by looking at three numeric factors and comparing them to the number of points scored in the game. 
+- For example, I'd take number of touchdowns, number of interceptions, and number of penalties, and look at the correlation between those three factors (independent variable) and the one single dependent variable (the number of points scored in the game).
+- After looking at the coefficients, I'd be able to determine whether there is strong evidence that shows if any of these factors impact the number of points won and by how much. 
