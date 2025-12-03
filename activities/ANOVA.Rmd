@@ -35,7 +35,9 @@ admissions_data <- data.frame(
   college_type = factor(rep(c("Public", "Private", "Community"), each = 100)),
   sat_score = c(public_college, private_college, community_college)
 )
-
+anova_data <- data.frame(
+  group = factor(rep(c("older","newer"), times = c(length)))
+)
 # Ensure SAT scores are within realistic range (400-1600)
 admissions_data$sat_score <- pmin(pmax(admissions_data$sat_score, 400), 1600)
 
