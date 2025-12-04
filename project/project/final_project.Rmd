@@ -1,0 +1,176 @@
+---
+title: "final_project"
+author: "Mara K. Bell"
+date: "2025-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+```
+
+# Loading Data
+I'm loading a dataset called Billboard Hot 100 here and getting a sense of the data.
+
+```{r load-data}
+# Loading the billboard data, parsing dates normally
+billboard <- read_csv("billboard.csv") |> 
+  clean_names() |>
+  mutate(date_new = dmy(date)) |> 
+  mutate(date_new = if_else(year(date_new) > 2024,  date_new - years(100), date_new)) |> 
+  select(date_new, everything())
+
+# Displaying first few rows to understand structure
+head(billboard)
+```
+## Data Source Overview
+This workbook contains substantial data about every song to ever top the Billboard Hot 100 between August 4, 1958 and January 11, 2025, compiled by Chris Dalla Riva.
+
+Creator: Chris Dalla Riva
+Data Dictionary: https://docs.google.com/spreadsheets/d/1MSp-Feo0X54bthtB5KT5ucSzUEwS89DHqVgKqDVOC7g/edit?usp=sharing
+
+
+## Describing the Dataset
+- This dataset looks at songs that topped the Billboard Hot 100 between 1958 and 2025.
+- It contains the song title, the artist, the first week it hit number one (date), how long it stayed (number of weeks), ratings, label information, genre, artist information (like where they're from, their gender, ethnicity (Black or White), songwriter information, producer information, musical information (like the danceability and energy), and other information.
+- The time period of this data stretches between Aug. 4, 1958 to Jan. 11, 2025.
+- For my analysis, the song title, genre, happiness, artist gender, and date would likely matter the most.
+- This data is missing important information about artists who are not White nor Black, as it only specifies for those two races.
+
+
+## Exploring the Data
+I'm exploring the Billboard data here by taking a glimpse, and using summarize() to look at the number of rows and columns in this dataset.
+
+```{r explore-data}
+# Getting a summary of the data
+glimpse(billboard)
+
+# Counting rows and columns
+billboard |>
+  summarize(
+    rows = n(),
+    columns = ncol(billboard)
+  )
+```
+
+You can see here that there are 1177 rows and 105 columns of data. It also looks like the data records several aspects of these songs, including information about the artist(s), the title of the songs, the label it came from, plenty of other details.
+
+
+## Calculating Basic Statistics
+Here, I'm calculating the basic statistics of the Happiness category in "billboard" using summarize(). I'm looking at the mean, median, minimum, and maximum of this data.
+
+```{r basic-statistics}
+# Calculating min, mean, median, max, and sd
+billboard |>
+  summarize(
+    min = min(happiness, na.rm = TRUE),
+    mean = mean(happiness, na.rm = TRUE),
+    median = median(happiness, na.rm = TRUE),
+    max = max(happiness, na.rm = TRUE),
+    sd = sd(happiness, na.rm = TRUE))
+```
+
+## Propose Hypothesis
+Null: 
+- The average happiness of newer songs (songs after (median date)) is less than or equal to the average happiness of older songs (songs before (median date)).
+- Plain English: Newer songs not happier than older songs.
+
+Alternative: 
+- The average happiness of newer songs is greater than the average happiness of older songs.
+- Plain English: Newer songs are happier than older songs.
+
+
+## Test No. 1: Calculating t-test
+Here, I'll formally test if newer songs are happier than older songs or not.
+
+**Hypotheses:**
+- H₀: µ_new <= µ_old (Newer songs not happier than older songs)
+- H₁: µ_new > µ_old (Newer songs are happier than older songs)
+
+```{r t-test}
+# Calculate median date to divide old and new songs
+median_date <- median(billboard$date_new, na.rm = TRUE)
+median_date
+
+# Make groups for older songs and newer songs
+older <- billboard |> filter(date_new <= median_date)
+newer <- billboard |> filter(date_new > median_date)
+
+# Calculate average happiness of older songs, ignoring missing vals
+older_mean <- mean(older$happiness, na.rm = TRUE)
+newer_mean <- mean(newer$happiness, na.rm = TRUE)
+
+# Performing a one-sample t-test
+# We're looking to see if newer songs are happier, so we use a one-sided test (alternative = "greater")
+t_test_result <- t.test(
+  newer$happiness,
+  mu = older_mean,
+  alternative = "greater"
+)
+
+# Display the results
+t_test_result
+
+```
+- In this test, I found that newer songs are not happier than older songs.
+- This means that I must fail to reject the null hypothesis because our alternative mean that new songs were happier.
+- You can see this because the mean happiness of newer songs was at a score of 56.1, while the mean happiness of older songs was at 67.4. New songs happiness was less than old songs happiness.
+- The negative test statistic also confirms that the observed mean was less than the hypothesized mean. Therefore, we must fail to reject the null hypothesis.
+
+## Test No. 2: Calculating ANOVA
+I'm formally testing if newer songs are happier than older songs or not too, but with an ANOVA.
+
+```{r anova-test}
+# I used AI to help me with the grouping column: https://chatgpt.com/share/692685b3-1eac-8001-8c66-3eb2ded90f5d
+
+median_date <- median(billboard$date_new, na.rm = TRUE)
+median_date
+
+# Split happiness into lists
+older_happy <- billboard |> filter(date_new <= median_date)
+newer_happy <- billboard |> filter(date_new > median_date)
+
+# Create grouping column for new and old songs
+anova_data <- data.frame(
+  groupy = factor(rep(
+    c("older", "newer"),
+    times = c(length(older_happy), length(newer_happy))
+  )),
+  happiness = c(older_happy, newer_happy)
+)
+
+# Run one-way ANOVA
+anova_result <- aov(happiness ~ groupy, data = anova_data)
+summary(anova_result)
+```
+- Troubleshooting: Messed a good amount with creating a grouping column. Researched and looked back at ANOVA activity to see examples. 
+- E.g.# Combine into a single dataframe
+admissions_data <- data.frame(
+  college_type = factor(rep(c("Public", "Private", "Community"), each = 100)),
+  sat_score = c(public_college, private_college, community_college)
+)
+anova_data <- data.frame(
+  group = factor(rep(c("older","newer"), times = c(length)))
+)
+
+## Making a chart
+
+```{r chart}
+# Defining the median date
+median_date <- median(billboard$date_new, na.rm = TRUE)
+median_date
+
+# Create a visualization of older v. newer songs and their happiness
+billboard_plot <- billboard |>
+  mutate(group = if_else(date_new <= median_date, "Older", "Newer"))
+
+# Making a boxplot
+ggplot(billboard_plot, aes(x = group, y = happiness, fill = group)) + geom_boxplot() + labs(
+  title = "Happiness of Older v. Newer No. 1 Billboard Songs in History",
+  x = "Song Youth",
+  y = "Happiness Score"
+) + theme_minimal()
+
+```
