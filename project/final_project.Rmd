@@ -11,23 +11,25 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
 ```
+Here, I'm setting up the environment and loading tidyverse and janitor for clean data manipulation.
 
 # Loading Data
 I'm loading a dataset called Billboard Hot 100 here and getting a sense of the data.
 
 ```{r load-data}
-# Loading the billboard data, parsing dates normally
+# Loads the billboard data, parsing dates normally
 billboard <- read_csv("billboard.csv") |> 
   clean_names() |>
   mutate(date_new = dmy(date)) |> 
   mutate(date_new = if_else(year(date_new) > 2024,  date_new - years(100), date_new)) |> 
   select(date_new, everything())
 
-# Displaying first few rows to understand structure
+# Displays first few rows to understand structure
 head(billboard)
 ```
 - You can see here that the date is in numeric format, there are song titles, names of artists, and several other columns that describe the hits.
-
+- The data stretches back to the 1950s, as seen in this first few rows.
+- The data also includes how long each hit stayed on the top.
 
 
 ## Data Source Overview
@@ -83,20 +85,20 @@ billboard |>
 
 ## Propose Hypothesis
 Null: 
-- The average happiness of newer songs (songs after (median date)) is less than or equal to the average happiness of older songs (songs before (median date)).
-- Plain English: Newer songs are not happier than older songs.
+- The average happiness of newer songs (songs after (median date)) is greater than or equal to the average happiness of older songs (songs before (median date)).
+- Plain English: Newer songs are happier than or as happy as older songs.
 
 Alternative: 
-- The average happiness of newer songs is greater than the average happiness of older songs.
-- Plain English: Newer songs are happier than older songs.
+- The average happiness of newer songs is less than or equal to the average happiness of older songs.
+- Plain English: Newer songs are not happier than older songs.
 
 
 ## Test No. 1: Calculating t-test
 Here, I'll formally test if newer songs are happier than older songs or not.
 
 **Hypotheses:**
-- H₀: µ_new <= µ_old (Newer songs not happier than older songs)
-- H₁: µ_new > µ_old (Newer songs are happier than older songs)
+- H₀: µ_new >= µ_old (Newer songs as happy or happier than older songs)
+- H₁: µ_new < µ_old (Newer songs are less happy than older songs)
 
 ```{r t-test}
 # Calculate median date to divide old and new songs
@@ -111,7 +113,7 @@ newer <- billboard |> filter(date_new > median_date)
 older_mean <- mean(older$happiness, na.rm = TRUE)
 newer_mean <- mean(newer$happiness, na.rm = TRUE)
 
-# Performing a one-sample t-test
+# Perform a one-sample t-test
 # We're looking to see if newer songs are not happier, so we use a two-sided test (alternative = "less")
 t_test_result <- t.test(
   newer$happiness,
@@ -124,31 +126,38 @@ t_test_result
 
 ```
 - In this test, I found that newer songs are not happier than older songs, and there is statistical signficance to believe so, with a p-value much lower than 0.05, at a value of 1.306e-15.
-- This means that I must fail to reject the null hypothesis that states that newer songs are not happier than older songs.
+- This means that I must reject the null hypothesis that states that newer songs as happy or happier than older songs.
 - You can see this because the mean happiness of newer songs was at a score of 56.1, while the mean happiness of older songs was at 67.4. New songs happiness was less than old songs happiness.
-- The negative test statistic also confirms that the observed mean was less than the hypothesized mean. Therefore, we must fail to reject the null hypothesis.
+- The negative test statistic also confirms that the observed mean was less than the hypothesized mean. Therefore, we must reject the null hypothesis.
 
 ## Test No. 2: Linear regression
-I'm formally testing if newer songs are happier than older songs or not too, but with an ANOVA.
+I'm formally testing here if the linear regression model illustrates a relationship between a dependent variable (happiness score) and an independent variable (the date). In other words, if we know the date in which a song hit No. 1 on Billboard hits, how reliably can we predict its happiness score?
+
 
 ```{r linear-regression}
-# REPLACE ME
+# Perform a linear regression model
 model <- lm(happiness ~ date_new, data = billboard)
 
-# REPLACE ME
+# Analyze the model with a statistical overview
 summary (model)
 
+# Calculate the correlation coefficient to see the strength and direction of the relationship
 cor(billboard$happiness,
     as.numeric(billboard$date_new),
     use = "complete.obs" # removes NAs
 )
 ```
-- REPLACE ME EXPLANATION
+- Looking at the summary, the slope estimate for date_new is 0.0007282. This means that in number-one hits, you could predict that happiness decreases by about 0.00073 points per day, or 0.27 points per year.
+- The low p-value of 5.48e-12 comes from a small standard error, meaning that the estimate is on the preciser side of things. I can say that my data provides strong evidence of a downward trend in happiness over time, instead of random chance.
+- However, the residual standard error of 24.3 means that the model deviates from the actual turnout by 24 points from the regression line, suggesting that there's a considerable amount of unexplained variance in the data.
+- The adjusted R-squared of 0.03889 also shows that only a small proportion, or about 4%, of variance in happiness is explained by the date, even though there is a trend.
+- The F-statistic at 48.5 with a low p-value at 5.484e-12 shows that although it doesn't explain most of the variance, there is statistical significance to use this model to describe the variance. Here, the date explains more about the variance in happiness with a linear regression model than no model at all. 
+- The correlation coefficient of -0.2 shows that there's a weak-moderate negative relationship between the date and happiness of Billboard No. 1 songs.
 
 ## Making a chart
 
 ```{r chart}
-# Defining the median date
+# Define the median date
 median_date <- median(billboard$date_new, na.rm = TRUE)
 median_date
 
@@ -158,7 +167,7 @@ billboard_plot <- billboard |>
          group = factor(group, levels = c("Older", "Newer"))
 )
 
-# Making a boxplot
+# Create boxplot
 ggplot(billboard_plot, aes(x = group, y = happiness, fill = group)) + geom_boxplot() + labs(
   title = "Happiness of Older v. Newer No. 1 Billboard Songs in History",
   x = "Song Youth",
@@ -173,6 +182,19 @@ billboard |>
   scale_x_date(date_breaks = "10 years", date_labels = "%Y", limits = as.Date(c("1955-01-01", "2025-12-31"))) + # to read every decade, remove empty space
   labs(x = "Release Year",
        y = "Happiness Score",
-       title = "Study Shows Happiness Declines Over Time in Billboard Hits")
+       title = "Happiness Declines Over Time in Billboard Hits")
 
 ```
+BOX PLOT
+- This box plot compares the distribution of happiness for the two groups of songs, Older No. 1 Billboard songs (or songs before 1986-01-18) and Newer No. 1 Billboard songs (or songs after the median date).
+- The boxes represent the middle 50% of the data. As you can see, older songs scored pretty high in happiness, with values clustering at the upper half, ranging from roughly 50 to 88 points. Newer songs, however, scored lower, with a middle 50% at roughly 38 to 78 points.
+- The median score for older songs was also higher (73-74) than the newer songs (58-59).
+- We should also note that both groups showed a varied range in happiness, with the least happiest songs scoring near 0 for both groups, and the happiest songs scoring near 100 for both groups.
+
+SCATTER PLOT
+- Each dot here represents an individual Billboard hit song, and its placement represents the release date and happiness score. 
+- The regression line shows an overall downwards trend, depicting how the overall happiness score of these songs has been on a decline over the years.
+- In the early 1960s, the average happiness score hovered around 70, while in the 2020s, the average happiness score dropped to near 55.
+- However, we should note that the data points are widely scattered for almost ever year, showing that although there's a trend, the correlation is weak to moderate and variance looks relatively consistent.
+
+
